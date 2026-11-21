@@ -686,7 +686,7 @@
 					<ControlPageLabel>Signal Strength</ControlPageLabel>
 				</State>
 		</States>
-		<UiDisplayStateId>lastCommand</UiDisplayStateId>
+		<UiDisplayStateId>command</UiDisplayStateId>
 	</Device>
 
 	<!-- ============================================================ Interface -->

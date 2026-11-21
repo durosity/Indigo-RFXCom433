@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.7
+- RF Remote devices show 'command' in Indigo's State column, so it clears along with the state
+
 ## 1.0.6
 - 'command' is now the current command and is what "Clear Command after" blanks; 'lastCommand' always keeps the most recent one
 - Both use RFXCom433's wording (e.g. "Mood5"); the old-plugin 'command' wording is gone

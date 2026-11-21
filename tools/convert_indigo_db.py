@@ -145,7 +145,7 @@ def convert_device(dev, plan, types):
     else:
         children.pop("BrightValue", None)
     if kind == "custom":
-        put("DisplayStateId", "lastCommand")
+        put("DisplayStateId", "command")
     else:
         children.pop("DisplayStateId", None)
     if new_class != old_class:
