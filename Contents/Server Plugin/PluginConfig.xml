@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<PluginConfig>
+	<SupportURL>https://github.com/durosity</SupportURL>
+	<Field id="titleLabel" type="label" fontSize="large">
+		<Label>RFXCom433</Label>
+	</Field>
+	<Field id="portLabel" type="label" fontColor="darkgray">
+		<Label>Choose the RFXtrx's USB serial port (usually /dev/cu.usbserial-xxxx), or a network socket if it's on a ser2net box.</Label>
+	</Field>
+	<Field type="serialport" id="serialPort"/>
+
+	<Field id="sepCreate" type="separator"/>
+	<Field id="autoCreate" type="menu" defaultValue="controls">
+		<Label>Auto-create devices:</Label>
+		<List>
+			<Option value="controls">Switches, remotes, doorbells and security sensors</Option>
+			<Option value="all">Everything, including weather and energy sensors</Option>
+			<Option value="off">Off - create from heard codes manually</Option>
+		</List>
+	</Field>
+	<Field id="minSightingsControls" type="textfield" defaultValue="1" visibleBindingId="autoCreate" visibleBindingValue="controls,all">
+		<Label>Hear switches/remotes this many times first:</Label>
+	</Field>
+	<Field id="minSightingsSensors" type="textfield" defaultValue="3" visibleBindingId="autoCreate" visibleBindingValue="all">
+		<Label>Hear sensors this many times first:</Label>
+	</Field>
+	<Field id="sightingsHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true" visibleBindingId="autoCreate" visibleBindingValue="controls,all">
+		<Label>Within 10 minutes. Higher sensor counts stop the neighbours' weather stations turning up as devices.</Label>
+	</Field>
+	<Field id="folderName" type="textfield" defaultValue="RFXCom433">
+		<Label>Put new devices in folder:</Label>
+	</Field>
+	<Field id="ignoreDeleted" type="checkbox" defaultValue="true">
+		<Label/>
+		<Description>Don't re-create devices I delete</Description>
+	</Field>
+	<Field id="dedupeSeconds" type="textfield" defaultValue="0.5">
+		<Label>Ignore repeats within (seconds):</Label>
+	</Field>
+	<Field id="dedupeHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+		<Label>Remotes often send the same command several times per press. 0 = keep every packet.</Label>
+	</Field>
+
+	<Field id="sepUnits" type="separator"/>
+	<Field id="tempUnits" type="menu" defaultValue="C">
+		<Label>Temperature:</Label>
+		<List>
+			<Option value="C">Celsius</Option>
+			<Option value="F">Fahrenheit</Option>
+		</List>
+	</Field>
+	<Field id="tempDecimals" type="menu" defaultValue="1">
+		<Label>Temperature decimals:</Label>
+		<List>
+			<Option value="0">0</Option>
+			<Option value="1">1</Option>
+		</List>
+	</Field>
+	<Field id="windUnits" type="menu" defaultValue="mph">
+		<Label>Wind speed:</Label>
+		<List>
+			<Option value="mph">mph</Option>
+			<Option value="kmh">km/h</Option>
+			<Option value="mps">m/s</Option>
+		</List>
+	</Field>
+	<Field id="rainUnits" type="menu" defaultValue="mm">
+		<Label>Rain:</Label>
+		<List>
+			<Option value="mm">mm</Option>
+			<Option value="in">inches</Option>
+		</List>
+	</Field>
+	<Field id="offlineAsError" type="checkbox" defaultValue="true">
+		<Label/>
+		<Description>Show offline devices in red (error state)</Description>
+	</Field>
+
+	<Field id="sepProto" type="separator"/>
+	<Field id="manageProtocols" type="checkbox" defaultValue="false">
+		<Label>Receiver protocols:</Label>
+		<Description>Let the plugin set which protocols the RFXtrx listens for</Description>
+	</Field>
+	<Field id="protoHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+		<Label>Applied on every connect (not written to the RFXtrx's flash, so no wear). Leave unticked to keep whatever RFXmngr set. Which protocols actually work depends on your firmware type.</Label>
+	</Field>
+		<Field id="proto_aeblyss" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>AE Blyss</Description>
+		</Field>
+		<Field id="proto_rubicson" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Rubicson / La Crosse / Banggood</Description>
+		</Field>
+		<Field id="proto_fineoffset" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Fine Offset / Viking</Description>
+		</Field>
+		<Field id="proto_lighting4" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Lighting4 (PT2262 and compatibles)</Description>
+		</Field>
+		<Field id="proto_rsl" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>RSL / Revolt</Description>
+		</Field>
+		<Field id="proto_byronsx" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Byron SX / Select Plus</Description>
+		</Field>
+		<Field id="proto_imagintronix" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Imagintronix / Opus</Description>
+		</Field>
+		<Field id="proto_undecoded" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Undecoded (diagnostics only)</Description>
+		</Field>
+		<Field id="proto_mertik" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Mertik Maxitrol</Description>
+		</Field>
+		<Field id="proto_adlightwave" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>LightwaveRF / Siemens</Description>
+		</Field>
+		<Field id="proto_hideki" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Hideki / UPM</Description>
+		</Field>
+		<Field id="proto_lacrosse" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>La Crosse</Description>
+		</Field>
+		<Field id="proto_fs20" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>FS20 (868 only)</Description>
+		</Field>
+		<Field id="proto_proguard" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>ProGuard (868 only)</Description>
+		</Field>
+		<Field id="proto_blindst0" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Blinds T0</Description>
+		</Field>
+		<Field id="proto_blindst1234" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Blinds T1-T4</Description>
+		</Field>
+		<Field id="proto_x10" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>X10</Description>
+		</Field>
+		<Field id="proto_arc" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>ARC (KaKu, Domia, Chacon...)</Description>
+		</Field>
+		<Field id="proto_ac" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>AC / HomeEasy UK / KaKu automatic</Description>
+		</Field>
+		<Field id="proto_homeeasy" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>HomeEasy EU</Description>
+		</Field>
+		<Field id="proto_meiantech" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Meiantech</Description>
+		</Field>
+		<Field id="proto_oregon" type="checkbox" defaultValue="true" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Oregon Scientific</Description>
+		</Field>
+		<Field id="proto_ati" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>ATI remotes</Description>
+		</Field>
+		<Field id="proto_visonic" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>Visonic (315/868 only)</Description>
+		</Field>
+		<Field id="proto_keeloq" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>KeeLoq</Description>
+		</Field>
+		<Field id="proto_homeconfort" type="checkbox" defaultValue="false" visibleBindingId="manageProtocols" visibleBindingValue="true">
+			<Label/>
+			<Description>HomeConfort</Description>
+		</Field>
+
+	<Field id="sepLog" type="separator"/>
+	<Field id="logUnknown" type="checkbox" defaultValue="true">
+		<Label>Logging:</Label>
+		<Description>Log packet types pyRFXtrx can't decode yet</Description>
+	</Field>
+	<Field id="logUndecoded" type="checkbox" defaultValue="false">
+		<Label/>
+		<Description>Log undecoded RF (needs the Undecoded protocol enabled)</Description>
+	</Field>
+	<Field id="showDebugInfo" type="checkbox" defaultValue="false">
+		<Label/>
+		<Description>Debug logging</Description>
+	</Field>
+	<Field id="logRawPackets" type="checkbox" defaultValue="false" visibleBindingId="showDebugInfo" visibleBindingValue="true">
+		<Label/>
+		<Description>Include every raw packet in hex</Description>
+	</Field>
+	<Field id="ignoredKeys" type="textfield" hidden="true" defaultValue=""/>
+</PluginConfig>

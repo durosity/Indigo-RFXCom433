@@ -1,0 +1,804 @@
+<?xml version="1.0"?>
+<Devices>
+	<!-- ============================================================ Switch / plug / remote -->
+	<Device type="relay" id="rfxSwitch">
+		<Name>RF Switch / Plug / Remote</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="transmit" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="role" type="menu" defaultValue="switch">
+				<Label>Behaviour:</Label>
+				<List>
+					<Option value="switch">Switch - send and receive (plug, socket, light, wall switch)</Option>
+					<Option value="button">Remote button - receive only, never transmits</Option>
+					<Option value="transmit">Transmit only - ignore anything received</Option>
+				</List>
+			</Field>
+			<Field id="roleHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>A plug that has learned a remote's code shares that code, so one device can be both the remote and the plug.</Label>
+			</Field>
+			<Field id="respondToGroup" type="checkbox" defaultValue="true">
+				<Label>Group commands:</Label>
+				<Description>Follow group on/off sent to this house/remote code</Description>
+			</Field>
+			<Field id="repeats" type="menu" defaultValue="1">
+				<Label>Transmit:</Label>
+				<List>
+					<Option value="1">Once</Option>
+					<Option value="2">Twice</Option>
+					<Option value="3">Three times</Option>
+				</List>
+			</Field>
+			<Field id="momentarySeconds" type="textfield" defaultValue="0" visibleBindingId="role" visibleBindingValue="button">
+				<Label>Auto-off after (seconds):</Label>
+			</Field>
+			<Field id="autoDimmer" type="checkbox" defaultValue="true">
+				<Label>Dimming:</Label>
+				<Description>Convert to a dimmer automatically if a dim level is heard</Description>
+			</Field>
+			<Field id="clearCommandSeconds" type="textfield" defaultValue="0">
+				<Label>Clear Command after (seconds):</Label>
+			</Field>
+			<Field id="clearCommandHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Blanks the Command state (e.g. "Mood3") after this delay so the same command shows as a fresh change next time. Last Command always keeps the most recent one. 0 = never clear.</Label>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="lastLevel" type="textfield" hidden="true" defaultValue="100"/>
+			<Field id="SupportsStatusRequest" type="checkbox" hidden="true" defaultValue="false"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Dimmer -->
+	<Device type="dimmer" id="rfxDimmer">
+		<Name>RF Dimmer</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="transmit" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="role" type="menu" defaultValue="switch">
+				<Label>Behaviour:</Label>
+				<List>
+					<Option value="switch">Switch - send and receive (plug, socket, light, wall switch)</Option>
+					<Option value="button">Remote button - receive only, never transmits</Option>
+					<Option value="transmit">Transmit only - ignore anything received</Option>
+				</List>
+			</Field>
+			<Field id="roleHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>A plug that has learned a remote's code shares that code, so one device can be both the remote and the plug.</Label>
+			</Field>
+			<Field id="respondToGroup" type="checkbox" defaultValue="true">
+				<Label>Group commands:</Label>
+				<Description>Follow group on/off sent to this house/remote code</Description>
+			</Field>
+			<Field id="repeats" type="menu" defaultValue="1">
+				<Label>Transmit:</Label>
+				<List>
+					<Option value="1">Once</Option>
+					<Option value="2">Twice</Option>
+					<Option value="3">Three times</Option>
+				</List>
+			</Field>
+			<Field id="momentarySeconds" type="textfield" defaultValue="0" visibleBindingId="role" visibleBindingValue="button">
+				<Label>Auto-off after (seconds):</Label>
+			</Field>
+			<Field id="clearCommandSeconds" type="textfield" defaultValue="0">
+				<Label>Clear Command after (seconds):</Label>
+			</Field>
+			<Field id="clearCommandHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Blanks the Command state (e.g. "Mood3") after this delay so the same command shows as a fresh change next time. Last Command always keeps the most recent one. 0 = never clear.</Label>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="lastLevel" type="textfield" hidden="true" defaultValue="100"/>
+			<Field id="autoDimmer" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="SupportsStatusRequest" type="checkbox" hidden="true" defaultValue="false"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Cover / blind / inline relay -->
+	<Device type="relay" id="rfxCover">
+		<Name>RF Blind / Cover</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="transmit" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="coverHelp" type="label" fontColor="darkgray">
+				<Label>On = open/up, Off = close/down. Use the Stop action to stop.</Label>
+			</Field>
+			<Field id="role" type="menu" defaultValue="switch">
+				<Label>Behaviour:</Label>
+				<List>
+					<Option value="switch">Send and receive</Option>
+					<Option value="transmit">Transmit only</Option>
+				</List>
+			</Field>
+			<Field id="respondToGroup" type="checkbox" defaultValue="true">
+				<Label>Group commands:</Label>
+				<Description>Follow group commands</Description>
+			</Field>
+			<Field id="repeats" type="menu" defaultValue="1">
+				<Label>Transmit:</Label>
+				<List>
+					<Option value="1">Once</Option>
+					<Option value="2">Twice</Option>
+					<Option value="3">Three times</Option>
+				</List>
+			</Field>
+			<Field id="clearCommandSeconds" type="textfield" defaultValue="0">
+				<Label>Clear Command after (seconds):</Label>
+			</Field>
+			<Field id="clearCommandHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Blanks the Command state (e.g. "Mood3") after this delay so the same command shows as a fresh change next time. Last Command always keeps the most recent one. 0 = never clear.</Label>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="SupportsStatusRequest" type="checkbox" hidden="true" defaultValue="false"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+				<State id="coverState">
+					<ValueType>
+						<List>
+							<Option value="open">Open</Option>
+							<Option value="closed">Closed</Option>
+							<Option value="stopped">Stopped</Option>
+						</List>
+					</ValueType>
+					<TriggerLabel>Cover State Changed</TriggerLabel>
+					<TriggerLabelPrefix>Cover State Is</TriggerLabelPrefix>
+					<ControlPageLabel>Cover State</ControlPageLabel>
+					<ControlPageLabelPrefix>Cover State Is</ControlPageLabelPrefix>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Environmental sensor -->
+	<Device type="sensor" id="rfxSensor">
+		<Name>RF Sensor (temperature, humidity, weather, energy...)</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="sensor" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="primaryValue" type="menu" defaultValue="auto">
+				<Label>Main value:</Label>
+				<List class="self" method="primaryValueList" dynamicReload="true"/>
+			</Field>
+			<Field id="primaryHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Shown in the device list and used by HomeKit. Every value is also a separate state.</Label>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="90">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="valueKeys" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="SupportsSensorValue" type="checkbox" hidden="true" defaultValue="true"/>
+			<Field id="SupportsOnState" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="SupportsBatteryLevel" type="checkbox" hidden="true" defaultValue="false"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Security sensor -->
+	<Device type="sensor" id="rfxSecurity">
+		<Name>RF Security Sensor (motion, door, smoke)</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="sensor" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="SupportsSensorValue" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="SupportsOnState" type="checkbox" hidden="true" defaultValue="true"/>
+			<Field id="SupportsBatteryLevel" type="checkbox" hidden="true" defaultValue="false"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+				<State id="status">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Status</TriggerLabel>
+					<ControlPageLabel>Status</ControlPageLabel>
+				</State>
+				<State id="tamper">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Tamper</TriggerLabel>
+					<ControlPageLabel>Tamper</ControlPageLabel>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Doorbell / chime -->
+	<Device type="sensor" id="rfxDoorbell">
+		<Name>RF Doorbell / Chime</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="transmit" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="momentarySeconds" type="textfield" defaultValue="5">
+				<Label>Show as pressed for (seconds):</Label>
+			</Field>
+			<Field id="chimeSound" type="textfield" defaultValue="1">
+				<Label>Default chime sound (0-15):</Label>
+			</Field>
+			<Field id="repeats" type="menu" defaultValue="1">
+				<Label>Transmit:</Label>
+				<List>
+					<Option value="1">Once</Option>
+					<Option value="2">Twice</Option>
+				</List>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+			<Field id="SupportsSensorValue" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="SupportsOnState" type="checkbox" hidden="true" defaultValue="true"/>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+		</States>
+	</Device>
+
+	<!-- ============================================================ Remote / handset -->
+	<Device type="custom" id="rfxRemote">
+		<Name>RF Remote / Wall Controller (receive only)</Name>
+		<ConfigUI>
+			<Field id="codeLabel" type="label" fontColor="darkgray">
+				<Label>Devices are normally auto-created when the plugin hears them. To set one up by hand, press the remote/button (or wait for the sensor to transmit), then pick it below.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Recently heard:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="useHeard" type="button">
+				<Label/>
+				<Title>Use This Code</Title>
+				<CallbackMethod>useHeardCode</CallbackMethod>
+			</Field>
+			<Field id="protocol" type="menu">
+				<Label>Protocol:</Label>
+				<List class="self" method="protocolList" filter="transmit" dynamicReload="true"/>
+			</Field>
+			<Field id="idString" type="textfield">
+				<Label>RF id:</Label>
+			</Field>
+			<Field id="idHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Format as pyRFXtrx shows it, e.g. AC/HomeEasy UK "0abcdef:3", LightwaveRF "f1a2b3:1", ARC "B2", Oregon "9b:03".</Label>
+			</Field>
+			<Field id="deviceKey" type="textfield" hidden="true"/>
+			<Field id="address" type="textfield" hidden="true"/>
+			<Field id="autoCreated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="pendingPatterns" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="migratedFrom" type="textfield" hidden="true" defaultValue=""/>
+			<Field id="legacyStates" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="dbMigrated" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="sep1" type="separator"/>
+			<Field id="remoteHelp" type="label" fontColor="darkgray">
+				<Label>For handsets and wall controllers you only want to react to (mood buttons, scene buttons). Use the RF Command Received event, or the Command / Last Command states.</Label>
+			</Field>
+			<Field id="clearCommandSeconds" type="textfield" defaultValue="0">
+				<Label>Clear Command after (seconds):</Label>
+			</Field>
+			<Field id="clearCommandHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Blanks the Command state (e.g. "Mood3") after this delay so the same command shows as a fresh change next time. Last Command always keeps the most recent one. 0 = never clear.</Label>
+			</Field>
+			<Field id="offlineAfterMinutes" type="textfield" defaultValue="0">
+				<Label>Mark offline after (minutes):</Label>
+			</Field>
+			<Field id="offlineHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>0 = never. Useful for sensors that report regularly.</Label>
+			</Field>
+		</ConfigUI>
+		<States>
+				<State id="command">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Command (current - clears after the delay set on the device)</TriggerLabel>
+					<ControlPageLabel>Command</ControlPageLabel>
+				</State>
+				<State id="lastCommand">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Command (kept)</TriggerLabel>
+					<ControlPageLabel>Last Command</ControlPageLabel>
+				</State>
+				<State id="lastSeen">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Heard</TriggerLabel>
+					<ControlPageLabel>Last Heard</ControlPageLabel>
+				</State>
+				<State id="lastSeenTimestamp">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Last Heard (epoch)</TriggerLabel>
+					<ControlPageLabel>Last Heard (epoch)</ControlPageLabel>
+				</State>
+				<State id="online">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Online</TriggerLabel>
+					<ControlPageLabel>Online</ControlPageLabel>
+				</State>
+				<State id="signalStrength">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Signal Strength (0-15)</TriggerLabel>
+					<ControlPageLabel>Signal Strength</ControlPageLabel>
+				</State>
+		</States>
+		<UiDisplayStateId>lastCommand</UiDisplayStateId>
+	</Device>
+
+	<!-- ============================================================ Interface -->
+	<Device type="custom" id="rfxInterface">
+		<Name>RFXtrx Interface (status)</Name>
+		<ConfigUI>
+			<Field id="ifaceLabel" type="label">
+				<Label>Shows the RFXtrx's connection and firmware details. The port and protocols are set in Plugins > RFXCom433 > Configure.</Label>
+			</Field>
+		</ConfigUI>
+		<States>
+				<State id="connectionState">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Connection State</TriggerLabel>
+					<ControlPageLabel>Connection State</ControlPageLabel>
+				</State>
+				<State id="port">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Port</TriggerLabel>
+					<ControlPageLabel>Port</ControlPageLabel>
+				</State>
+				<State id="transceiverType">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Transceiver Type</TriggerLabel>
+					<ControlPageLabel>Transceiver Type</ControlPageLabel>
+				</State>
+				<State id="firmwareVersion">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Firmware Version</TriggerLabel>
+					<ControlPageLabel>Firmware Version</ControlPageLabel>
+				</State>
+				<State id="firmwareType">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Firmware Type</TriggerLabel>
+					<ControlPageLabel>Firmware Type</ControlPageLabel>
+				</State>
+				<State id="hardwareVersion">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Hardware Version</TriggerLabel>
+					<ControlPageLabel>Hardware Version</ControlPageLabel>
+				</State>
+				<State id="outputPower">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Output Power</TriggerLabel>
+					<ControlPageLabel>Output Power</ControlPageLabel>
+				</State>
+				<State id="noiseLevel">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Noise Level</TriggerLabel>
+					<ControlPageLabel>Noise Level</ControlPageLabel>
+				</State>
+				<State id="enabledProtocols">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Receiver Protocols</TriggerLabel>
+					<ControlPageLabel>Receiver Protocols</ControlPageLabel>
+				</State>
+				<State id="receiverStarted">
+					<ValueType boolType="TrueFalse">Boolean</ValueType>
+					<TriggerLabel>Receiver Started</TriggerLabel>
+					<ControlPageLabel>Receiver Started</ControlPageLabel>
+				</State>
+				<State id="lastConnected">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Connected</TriggerLabel>
+					<ControlPageLabel>Last Connected</ControlPageLabel>
+				</State>
+				<State id="packetsReceived">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Packets Received</TriggerLabel>
+					<ControlPageLabel>Packets Received</ControlPageLabel>
+				</State>
+				<State id="packetsSent">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Packets Sent</TriggerLabel>
+					<ControlPageLabel>Packets Sent</ControlPageLabel>
+				</State>
+				<State id="txFailures">
+					<ValueType>Integer</ValueType>
+					<TriggerLabel>Transmit Failures</TriggerLabel>
+					<ControlPageLabel>Transmit Failures</ControlPageLabel>
+				</State>
+				<State id="lastPacketTime">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Packet Time</TriggerLabel>
+					<ControlPageLabel>Last Packet Time</ControlPageLabel>
+				</State>
+				<State id="lastPacketHex">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Packet (hex)</TriggerLabel>
+					<ControlPageLabel>Last Packet (hex)</ControlPageLabel>
+				</State>
+				<State id="lastReceived">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last Received</TriggerLabel>
+					<ControlPageLabel>Last Received</ControlPageLabel>
+				</State>
+				<State id="lastNewSignal">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last New Code Heard</TriggerLabel>
+					<ControlPageLabel>Last New Code Heard</ControlPageLabel>
+				</State>
+				<State id="lastNewSignalKey">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Last New Code Key</TriggerLabel>
+					<ControlPageLabel>Last New Code Key</ControlPageLabel>
+				</State>
+				<State id="firmwareUpdateStatus">
+					<ValueType>String</ValueType>
+					<TriggerLabel>Firmware Update Status</TriggerLabel>
+					<ControlPageLabel>Firmware Update Status</ControlPageLabel>
+				</State>
+		</States>
+		<UiDisplayStateId>connectionState</UiDisplayStateId>
+	</Device>
+</Devices>

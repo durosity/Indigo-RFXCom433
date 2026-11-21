@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<Actions>
+	<Action id="groupOn" deviceFilter="self.rfxSwitch,self.rfxDimmer">
+		<Name>Send Group On</Name>
+		<CallbackMethod>actionGroup</CallbackMethod>
+	</Action>
+	<Action id="groupOff" deviceFilter="self.rfxSwitch,self.rfxDimmer,self.rfxCover">
+		<Name>Send Group Off</Name>
+		<CallbackMethod>actionGroup</CallbackMethod>
+	</Action>
+	<Action id="lightwave" deviceFilter="self.rfxSwitch,self.rfxDimmer">
+		<Name>LightwaveRF Mood / Lock</Name>
+		<CallbackMethod>actionLightwave</CallbackMethod>
+		<ConfigUI>
+			<Field id="lwCommand" type="menu" defaultValue="mood1">
+				<Label>Command:</Label>
+				<List>
+					<Option value="mood1">Mood 1</Option>
+					<Option value="mood2">Mood 2</Option>
+					<Option value="mood3">Mood 3</Option>
+					<Option value="mood4">Mood 4</Option>
+					<Option value="mood5">Mood 5</Option>
+					<Option value="lock">Lock</Option>
+					<Option value="unlock">Unlock</Option>
+					<Option value="alllock">All lock</Option>
+				</List>
+			</Field>
+		</ConfigUI>
+	</Action>
+	<Action id="coverStop" deviceFilter="self.rfxCover">
+		<Name>Stop Blind / Cover</Name>
+		<CallbackMethod>actionStop</CallbackMethod>
+	</Action>
+	<Action id="pair" deviceFilter="self.rfxSwitch,self.rfxDimmer,self.rfxCover">
+		<Name>Send Pairing Signal</Name>
+		<CallbackMethod>actionPair</CallbackMethod>
+	</Action>
+	<Action id="chimeRing" deviceFilter="self.rfxDoorbell">
+		<Name>Ring Chime</Name>
+		<CallbackMethod>actionChime</CallbackMethod>
+		<ConfigUI>
+			<Field id="sound" type="textfield" defaultValue="">
+				<Label>Sound (0-15):</Label>
+			</Field>
+			<Field id="soundHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Blank uses the device's default sound.</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+	<Action id="sep1"/>
+	<Action id="sendRaw">
+		<Name>Send Raw RFXtrx Packet</Name>
+		<CallbackMethod>actionRaw</CallbackMethod>
+		<ConfigUI>
+			<Field id="packet" type="textfield" defaultValue="">
+				<Label>Packet (hex):</Label>
+			</Field>
+			<Field id="packetHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>e.g. 0B 11 00 00 01 23 45 67 03 01 0F 00. The length byte is added if you leave it off.</Label>
+			</Field>
+		</ConfigUI>
+	</Action>
+	<Action id="reconnect">
+		<Name>Reconnect to RFXtrx</Name>
+		<CallbackMethod>actionReconnect</CallbackMethod>
+	</Action>
+</Actions>

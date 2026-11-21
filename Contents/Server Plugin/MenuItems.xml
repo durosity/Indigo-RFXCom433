@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<MenuItems>
+	<MenuItem id="status">
+		<Name>Show Interface Status</Name>
+		<CallbackMethod>menuStatus</CallbackMethod>
+	</MenuItem>
+	<MenuItem id="heard">
+		<Name>Log Recently Heard Codes</Name>
+		<CallbackMethod>menuHeard</CallbackMethod>
+	</MenuItem>
+	<MenuItem id="createFromHeard">
+		<Name>Create Device from Heard Code...</Name>
+		<ConfigUI>
+			<Field id="cfhLabel" type="label">
+				<Label>Press the remote button or wait for the sensor to transmit, then refresh the list by reopening this dialog if needed.</Label>
+			</Field>
+			<Field id="heardKey" type="menu" defaultValue="none">
+				<Label>Heard code:</Label>
+				<List class="self" method="heardList" dynamicReload="true"/>
+			</Field>
+			<Field id="createType" type="menu" defaultValue="auto">
+				<Label>Create as:</Label>
+				<List>
+					<Option value="auto">Automatic</Option>
+					<Option value="rfxSwitch">Switch / plug</Option>
+					<Option value="rfxDimmer">Dimmer</Option>
+					<Option value="button">Remote button (receive only)</Option>
+					<Option value="rfxRemote">Handset / wall controller (no on/off)</Option>
+					<Option value="rfxCover">Blind / cover</Option>
+					<Option value="rfxDoorbell">Doorbell / chime</Option>
+					<Option value="rfxSensor">Sensor</Option>
+				</List>
+			</Field>
+			<Field id="createName" type="textfield" defaultValue="">
+				<Label>Name (optional):</Label>
+			</Field>
+			<Field id="createButton" type="button">
+				<Label/>
+				<Title>Create Device</Title>
+				<CallbackMethod>createFromHeard</CallbackMethod>
+			</Field>
+			<Field id="createResult" type="textfield" readonly="YES" defaultValue="">
+				<Label>Result:</Label>
+			</Field>
+		</ConfigUI>
+	</MenuItem>
+	<MenuItem id="newCode">
+		<Name>Create New Transmitter Code...</Name>
+		<ConfigUI>
+			<Field id="ncLabel" type="label">
+				<Label>Makes a brand-new random code so Indigo can control a plug or light without a remote. Create it, put the receiver into learn mode, then turn the new device on.</Label>
+			</Field>
+			<Field id="newProtocol" type="menu" defaultValue="ac">
+				<Label>Protocol:</Label>
+				<List>
+					<Option value="ac">AC / HomeEasy UK / KlikAanKlikUit</Option>
+					<Option value="heeu">HomeEasy EU</Option>
+					<Option value="lwrf">LightwaveRF</Option>
+					<Option value="arc">ARC (code wheel)</Option>
+				</List>
+			</Field>
+			<Field id="newUnit" type="textfield" defaultValue="1">
+				<Label>Unit (1-16):</Label>
+			</Field>
+			<Field id="newDimmable" type="checkbox" defaultValue="false">
+				<Label/>
+				<Description>Dimmer (AC/HomeEasy and LightwaveRF only)</Description>
+			</Field>
+			<Field id="newName" type="textfield" defaultValue="">
+				<Label>Name (optional):</Label>
+			</Field>
+			<Field id="newButton" type="button">
+				<Label/>
+				<Title>Create Device</Title>
+				<CallbackMethod>createNewCode</CallbackMethod>
+			</Field>
+			<Field id="newResult" type="textfield" readonly="YES" defaultValue="">
+				<Label>Result:</Label>
+			</Field>
+		</ConfigUI>
+	</MenuItem>
+	<MenuItem id="ignored">
+		<Name>Manage Ignored Codes...</Name>
+		<ConfigUI>
+			<Field id="igLabel" type="label">
+				<Label>Codes from devices you've deleted. They won't be auto-created again until removed from this list.</Label>
+			</Field>
+			<Field id="ignoredSelection" type="list" rows="10">
+				<Label>Ignored:</Label>
+				<List class="self" method="ignoredList" dynamicReload="true"/>
+			</Field>
+			<Field id="unignoreSel" type="button">
+				<Label/>
+				<Title>Stop Ignoring Selected</Title>
+				<CallbackMethod>unignoreSelected</CallbackMethod>
+			</Field>
+			<Field id="unignoreAllBtn" type="button">
+				<Label/>
+				<Title>Clear List</Title>
+				<CallbackMethod>unignoreAll</CallbackMethod>
+			</Field>
+		</ConfigUI>
+	</MenuItem>
+	<MenuItem id="migrate">
+		<Name>Migrate from Old RFXCOM Plugin...</Name>
+		<ConfigUI>
+			<Field id="migLabel" type="label">
+				<Label>Creates RFXCom433 devices for the devices the old RFXCOM plugin made (AC, HomeEasy and LightwaveRF switches and dimmers, AC/LightwaveRF remote buttons, temperature sensors). Old devices aren't deleted. Preview first - the plan is written to the Indigo log.</Label>
+			</Field>
+			<Field id="migratePreviewBtn" type="button">
+				<Label/>
+				<Title>Preview</Title>
+				<CallbackMethod>migratePreview</CallbackMethod>
+			</Field>
+			<Field id="migrateRename" type="checkbox" defaultValue="true">
+				<Label/>
+				<Description>Rename old devices to "... (old)" and give new ones the original names</Description>
+			</Field>
+			<Field id="migrateStates" type="checkbox" defaultValue="true">
+				<Label/>
+				<Description>Copy on/off and brightness from the old devices</Description>
+			</Field>
+			<Field id="migrateRunBtn" type="button">
+				<Label/>
+				<Title>Migrate</Title>
+				<CallbackMethod>migrateRun</CallbackMethod>
+			</Field>
+			<Field id="migrateResult" type="textfield" readonly="YES" defaultValue="">
+				<Label>Result:</Label>
+			</Field>
+		</ConfigUI>
+	</MenuItem>
+	<MenuItem id="sep1"/>
+	<MenuItem id="reconnect">
+		<Name>Reconnect to RFXtrx</Name>
+		<CallbackMethod>menuReconnect</CallbackMethod>
+	</MenuItem>
+	<MenuItem id="firmware">
+		<Name>Update RFXtrx Firmware...</Name>
+		<ConfigUI>
+			<Field id="fwWarn" type="label" fontColor="red">
+				<Label>Only for the RFXtrx433, RFXtrx433E and RFXtrx868 on a local USB port. Don't unplug the RFXtrx or restart Indigo while it runs (a few minutes). If it's interrupted the unit stays in its bootloader and can be flashed again here or with RFXflash on Windows. Receiver protocol settings are reset by the update.</Label>
+			</Field>
+			<Field id="firmwarePath" type="textfield" defaultValue="">
+				<Label>Firmware .hex file:</Label>
+			</Field>
+			<Field id="fwPathHelp" type="label" fontSize="small" fontColor="darkgray" alignWithControl="true">
+				<Label>Full path, e.g. ~/Downloads/RFXtrx433_Ext2_1012.hex. Use the build that matches your unit (Type1/Type2/Ext/Ext2).</Label>
+			</Field>
+			<Field id="fwCheck" type="button">
+				<Label/>
+				<Title>Check File</Title>
+				<CallbackMethod>firmwareCheck</CallbackMethod>
+			</Field>
+			<Field id="firmwareChecked" type="checkbox" hidden="true" defaultValue="false"/>
+			<Field id="firmwareConfirm" type="checkbox" defaultValue="false">
+				<Label/>
+				<Description>I understand the risk - flash this firmware</Description>
+			</Field>
+			<Field id="fwStart" type="button">
+				<Label/>
+				<Title>Start Update</Title>
+				<CallbackMethod>firmwareStart</CallbackMethod>
+			</Field>
+			<Field id="firmwareResult" type="textfield" readonly="YES" defaultValue="">
+				<Label>Result:</Label>
+			</Field>
+		</ConfigUI>
+	</MenuItem>
+	<MenuItem id="sep2"/>
+	<MenuItem id="debug">
+		<Name>Toggle Debug Logging</Name>
+		<CallbackMethod>menuToggleDebug</CallbackMethod>
+	</MenuItem>
+</MenuItems>

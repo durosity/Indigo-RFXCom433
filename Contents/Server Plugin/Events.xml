@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<Events>
+	<Event id="commandReceived">
+		<Name>RF Command Received</Name>
+		<ConfigUI>
+			<Field id="evLabel" type="label" fontColor="darkgray">
+				<Label>Fires on every press, even if the device's state doesn't change (e.g. pressing On twice).</Label>
+			</Field>
+			<Field id="deviceId" type="menu" defaultValue="any">
+				<Label>Device:</Label>
+				<List class="self" method="rfDeviceList" dynamicReload="true"/>
+			</Field>
+			<Field id="command" type="menu" defaultValue="any">
+				<Label>Command:</Label>
+				<List>
+					<Option value="any">Any</Option>
+					<Option value="on">On</Option>
+					<Option value="off">Off</Option>
+					<Option value="group_on">Group on</Option>
+					<Option value="group_off">Group off</Option>
+					<Option value="level">Set level</Option>
+					<Option value="mood1">LightwaveRF mood 1</Option>
+					<Option value="mood2">LightwaveRF mood 2</Option>
+					<Option value="mood3">LightwaveRF mood 3</Option>
+					<Option value="mood4">LightwaveRF mood 4</Option>
+					<Option value="mood5">LightwaveRF mood 5</Option>
+					<Option value="lock">Lock</Option>
+					<Option value="unlock">Unlock</Option>
+					<Option value="open">Open / up</Option>
+					<Option value="close">Close / down</Option>
+					<Option value="stop">Stop</Option>
+					<Option value="text">Contains text...</Option>
+				</List>
+			</Field>
+			<Field id="commandText" type="textfield" defaultValue="" visibleBindingId="command" visibleBindingValue="text">
+				<Label>Command contains:</Label>
+			</Field>
+			<Field id="includeUnknown" type="checkbox" defaultValue="false" visibleBindingId="deviceId" visibleBindingValue="any">
+				<Label/>
+				<Description>Also fire for codes that have no device</Description>
+			</Field>
+		</ConfigUI>
+	</Event>
+	<Event id="newSignal">
+		<Name>New RF Code Heard</Name>
+	</Event>
+	<Event id="deviceOffline">
+		<Name>Device Went Offline</Name>
+		<ConfigUI>
+			<Field id="deviceId" type="menu" defaultValue="any">
+				<Label>Device:</Label>
+				<List class="self" method="rfDeviceList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+	</Event>
+	<Event id="deviceOnline">
+		<Name>Device Came Back Online</Name>
+		<ConfigUI>
+			<Field id="deviceId" type="menu" defaultValue="any">
+				<Label>Device:</Label>
+				<List class="self" method="rfDeviceList" dynamicReload="true"/>
+			</Field>
+		</ConfigUI>
+	</Event>
+	<Event id="interfaceDisconnected">
+		<Name>RFXtrx Connection Lost</Name>
+	</Event>
+	<Event id="interfaceConnected">
+		<Name>RFXtrx Connected</Name>
+	</Event>
+	<Event id="firmwareFinished">
+		<Name>Firmware Update Finished</Name>
+	</Event>
+</Events>
